@@ -120,7 +120,7 @@ namespace KDLCompiler
         private static void testS3Uploading()
         {
             string foldername = @"E:\JK\KDLPages_WebsiteProject\SourceFiles\output\testings3upload";
-            S3Uploader uploader = new S3Uploader("AKIAUJ6KPJLEYSJKIAGE", "Lmjtm23tRyo0DV59dUFPCeE5+j23aIwXbB6ifkb0", "us-west-2", "axonator.co", foldername);
+            S3Uploader uploader = new S3Uploader("","", "us-west-2", "axonator.co", foldername);
 
             // Get all files in the folder
             string[] files = Directory.GetFiles(foldername);
