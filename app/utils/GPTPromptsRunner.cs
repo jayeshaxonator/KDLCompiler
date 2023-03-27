@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using Newtonsoft.Json;
 
 namespace KDLCompiler
 {
@@ -13,27 +14,28 @@ namespace KDLCompiler
             
             // Load JSON from file
             string jsonString = File.ReadAllText(inputFilePath);
-            JsonDocument document = JsonDocument.Parse(jsonString);
+            //JsonDocument document = JsonDocument.Parse(jsonString);
+            var input = JsonConvert.DeserializeObject<GPTPromptFile>(jsonString);
 
-            // Create new JSON array for output
-            var outputArray = new JsonArray();
+            var outputContent = new GPTResponseFile();
+            outputContent.Responses = new List<GPTResponse>();
 
-            // Loop through each element in the input array and calculate length
-            foreach (JsonElement element in document.RootElement.EnumerateArray())
+            foreach (var gptPrompt in input.Prompts)
             {
-                // int length = element.GetRawText().Length;
-                // outputArray.Add(JsonValue.Create(length));
-                string prompt = element.GetString();
+                string prompt = gptPrompt.Prompt;
                 Console.WriteLine("Running prompt: "+ prompt);
                 string result = ai.GetResponse(prompt);
                 Console.WriteLine("ChatGPT Response: " + result);
-                outputArray.Add(JsonValue.Create(result));
-                //add delay 
+                GPTResponse response = new GPTResponse();
+                response.Section = gptPrompt.Section;
+                response.Response = result;
+                
+                outputContent.Responses.Add(response);
                 System.Threading.Thread.Sleep(5000);
             }
-
             // Write output JSON to file
-            File.WriteAllText(outputFilePath, outputArray.ToString());
+            var outputJson = JsonConvert.SerializeObject(outputContent, Formatting.Indented);
+             File.WriteAllText(outputFilePath, outputJson);
         }
     }
 }

@@ -20,7 +20,7 @@ namespace KDLCompiler
 
         private  async Task<string> getChatGPTResponse(string prompt)
         {
-            var api = new OpenAIClient(new OpenAIAuthentication("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"));
+            var api = new OpenAIClient(new OpenAIAuthentication("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"));
             string response = string.Empty;
             var chatPrompts = new List<ChatPrompt>
             {

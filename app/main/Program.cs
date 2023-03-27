@@ -18,14 +18,39 @@ namespace KDLCompiler
             //testChatGPTAPI();
 
             //task.Wait();
-
-            testGPTAPICalls();
+            InitGlobalPaths();
+            //testGPTResponseFiletoKDL();
+            testCSVAppNameRename();
+            
             //testGPTGeneratePrompts();
+            //testGPTAPICalls();
             // string response = testOpenAI();
             // testValidateResponse(response);
             // testBenefitsParsing(response);
             //testS3Uploading();
 
+        }
+
+        private static void testCSVAppNameRename()
+        {
+            string csvFileName = @"E:\JK\app30k.csv";
+            var csv = new CSVProcessor(csvFileName);
+            csv.ProcessCSV();
+        }
+
+        private static void testGPTResponseFiletoKDL()
+        {
+            string inputFilePath = @"E:\JK\GPTJsonPageGenFiles\GPTPageContentOutput.jsonc";
+            string outputFilePath = @"E:\JK\GPTJsonPageGenFiles\GPTPageContentKDL.kdl";
+            string promptGeneratorFilePath = @"E:\JK\GPTJsonPageGenFiles\GPTInput.jsonc";
+            
+            runGPTResponseFiletoKDL(inputFilePath, outputFilePath, promptGeneratorFilePath);
+            
+        }
+
+        private static void runGPTResponseFiletoKDL(string inputFilePath, string outputFilePath, string promptGeneratorFilePath)
+        {
+            GPTResponseFiletoKDL.Run(inputFilePath, outputFilePath, promptGeneratorFilePath);
         }
 
         private static void testChatGPTAPI()
@@ -140,19 +165,13 @@ namespace KDLCompiler
 
         private static void MainCompilationStart()
         {
-            string system_folder = @"E:\JK\KDLPages_WebsiteProject\SystemFiles";
-            string project_folder = @"E:\JK\KDLPages_WebsiteProject\SourceFiles";
-            string output_folder = project_folder + @"\output\";
-
-            GlobalPaths.SystemFolder = system_folder;
-            GlobalPaths.ProjectFolder = project_folder;
-            GlobalPaths.OutputFolder = output_folder;
+            InitGlobalPaths();
 
             CopyFolder(Path.Combine(GlobalPaths.SystemFolder, "assets_to_copy"), GlobalPaths.OutputFolder);
 
             PageListBuilder builder = new PageListBuilder(GlobalPaths.ProjectFolder);
             List<string> pageList = builder.BuildPageList();
-            Compiler c = new Compiler(system_folder);
+            Compiler c = new Compiler(GlobalPaths.SystemFolder);
 
             foreach (string file in pageList)
             {
@@ -160,6 +179,17 @@ namespace KDLCompiler
                 KDLFile inputFile = new KDLFile(Path.Combine(GlobalPaths.ProjectFolder, file));
                 c.Compile(inputFile, Path.Combine(GlobalPaths.OutputFolder, Path.GetFileNameWithoutExtension(file) + ".html"), GlobalPaths.OutputFolder + Path.GetFileName(file) + ".html.errors.txt");
             }
+        }
+
+        private static void InitGlobalPaths()
+        {
+            string system_folder = @"E:\JK\KDLPages_WebsiteProject\SystemFiles";
+            string project_folder = @"E:\JK\KDLPages_WebsiteProject\SourceFiles";
+            string output_folder = project_folder + @"\output\";
+
+            GlobalPaths.SystemFolder = system_folder;
+            GlobalPaths.ProjectFolder = project_folder;
+            GlobalPaths.OutputFolder = output_folder;
         }
 
         public static void CopyFolder(string sourceFolderPath, string destinationFolderPath)
